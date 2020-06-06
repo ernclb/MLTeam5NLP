@@ -1,6 +1,5 @@
 import requests
-print('hello')
+from bs4 import BeautifulSoup
 r = requests.get('http://google.com')
-print(r.text)
-print(help(r))
-#Test addition
+soup = BeautifulSoup(r.text, 'html.parser')
+print(soup)
