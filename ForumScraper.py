@@ -1,63 +1,54 @@
 import requests
 import pprint
 import json
-
-# page_amount = 7
-i = 1
-new_submissions = []
+from bs4 import BeautifulSoup
+import urllib
+import pickle
 
 def cleans_dictionary(raw_dictionary):
-    #get all the slugs and topic_id's out of this dictionary (make sure the parameters are string)
-    #and make a new dictionary with the 30 topics just the id's and slugs
-    #new_submissions = [{'topic_id': 23124,'slug':'debit-cards'},{'topic_id': 846283,'slug':'credit-card'}]
-    list_dictionary =[]
-    
-    for dic in raw_dictionary:
-        temp_dict=dict()
-        temp_dict['topic_id'] = dic['id']
-        temp_dict['slug'] = dic['slug']
-        list_dictionary.append(temp_dict)
-
-
-    return list_dictionary  
-
-
-# Commented out the following for checking output
-# def get_forum_message(message):
-#     #Use the html to parse and get the message submission  
-
-
+ 
+    post_dist = {}
+    global new_submissions
+    for post in raw_dictionary['topic_list']['topics'] :
       
+      post_dist['id'] = str(post['id'])
+      post_dist['slug'] = str(post['slug'])
+      new_submissions.append(post_dist)
+      post_dist={}
+    
+def get_forum_message(page):    
 
+    soup = BeautifulSoup(page.content, 'html.parser')
+    for anchors in soup.find_all('a'):
+      anchors.extract()
 
-while 1:
+    postData = soup.find_all("p")
+    
+    posts = []
+    for post in postData:
+        posts.append(BeautifulSoup(str(post)).get_text().strip().replace("\t", ""))
 
-    clean_dictionary_list=[]
-    url = "https://community.bnz.co.nz/latest.json?no_definitions=true&page="+str(i)
+    posts_stripped = [x.replace("\n","") for x in posts]
+
+    return posts_stripped
+
+page_amount = 7
+new_submissions = []
+clean_posts=[]
+for page in range(1,page_amount+1) :
+    url = "https://community.bnz.co.nz/latest.json?no_definitions=true&page="+str(page)
     r = (requests.get(url)).text
     raw_dictionary = json.loads(r)
-    raw_dictionary_topics = raw_dictionary["topic_list"]["topics"]
-    if len(raw_dictionary_topics) == 0:
-        break
-      
-    clean_dictionary_list = cleans_dictionary(raw_dictionary_topics)
-    new_submissions += clean_dictionary_list
-
-    i += 1
-
-
-print("New Submissions\n")
-print(new_submissions)   
-
-# Commented the following to check the output of the program
-
-# topic_url = "https://community.bnz.co.nz/t/"
-# for submission in new_submissions:
-#     topic_url += (submission['slug'] + '/' + submission['topic_id'])
-#     message_in_html = requests.get(topic_url).text
-#     get_forum_message(message_in_html)
-
-
+    cleans_dictionary(raw_dictionary)
     
-  
 
+topic_url = "https://community.bnz.co.nz/t/"
+for submission in new_submissions:
+    topic_url += (submission['slug'] + '/' + submission['id'])
+    page = requests.get(topic_url)
+    clean_posts.append([topic_url,get_forum_message(page)])
+    topic_url = "https://community.bnz.co.nz/t/"
+
+
+with open("Data.pickle", "wb") as output_file:
+    pickle.dump(clean_posts, output_file)
