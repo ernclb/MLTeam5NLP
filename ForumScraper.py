@@ -1,28 +1,35 @@
 import requests
-import pprint
 import json
+import pprint
+import pickle
+import time
+from bs4 import BeautifulSoup
 
-page_amount = 7
-i = 1
-new_submissions = []
-while len(dic['topic_list']['topics']) > 0:
-    url = "https://community.bnz.co.nz/latest.json?no_definitions=true&page="+i
-    r = (requests.get(url)).text
-    raw_dictionary = json.loads(r)
-    clean_dictionary = cleans_dictionary(raw_dictionary)
-    new_submissions.append(clean_dictionary)
-    i += 1
-
-topic_url = "https://community.bnz.co.nz/t/"
-for submission in new_submissions:
-    topic_url += (submission['slug'] + '/' + submission['topic_id'])
-    message_in_html = requests.get(topic_url).text
-    get_forum_message(message_in_html)
+# this can also be done with scrapy where I only scrape a certain xpath. 
+# To do that use: xpath = '/html/body/div/div[2]'
 
 def get_forum_message(message):
-    #Use the html to parse and get the message submission
-    
-def cleans_dictionary(raw_dictionary):
-    #get all the slugs and topic_id's out of this dictionary (make sure the parameters are string)
-    #and make a new dictionary with the 30 topics just the id's and slugs
-    #new_submissions = [{'topic_id': 23124,'slug':'debit-cards'},{'topic_id': 846283,'slug':'credit-card'}]
+    soup = BeautifulSoup(message,features="lxml")
+    div = soup.find("div", {"itemprop": "articleBody"})
+    ht = div.findAll('p')
+    submission_text = ''
+    for i in ht:
+        submission_text += i.get_text() 
+    return submission_text
+
+
+with open("all_the_topic_names.pickle", "rb") as input_file:
+    new_submissions = pickle.load(input_file)
+
+dic = []
+breaker = len(new_submissions)
+for i in range(breaker):
+    print((i/breaker)*100)
+    submission = new_submissions[i]
+    topic_url = ("https://community.bnz.co.nz/t/" + submission[1] + '/' + str(submission[0]))
+    response = requests.get(topic_url)
+    message = response.text
+    dic.append([topic_url,get_forum_message(message)])
+
+with open("text_submissions.pickle", "wb") as output_file:
+    pickle.dump(dic, output_file)
