@@ -23,7 +23,7 @@ with open("topic_names_1hack.pickle", "rb") as input_file:
 
 dic = []
 breaker = len(new_submissions)
-for i in range(1):
+for i in range(breaker):
     print((i/breaker)*100)
     submission = new_submissions[i]
     topic_url = ("https://onehack.us/t/" + submission[1] + '/' + str(submission[0]))
@@ -33,3 +33,4 @@ for i in range(1):
 
 with open("text_submissions.pickle", "wb") as output_file:
     pickle.dump(dic, output_file)
+    
