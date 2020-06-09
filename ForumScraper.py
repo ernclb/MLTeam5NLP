@@ -18,15 +18,15 @@ def get_forum_message(message):
     return submission_text
 
 
-with open("all_the_topic_names.pickle", "rb") as input_file:
+with open("topic_names_1hack.pickle", "rb") as input_file:
     new_submissions = pickle.load(input_file)
 
 dic = []
 breaker = len(new_submissions)
-for i in range(breaker):
+for i in range(1):
     print((i/breaker)*100)
     submission = new_submissions[i]
-    topic_url = ("https://community.bnz.co.nz/t/" + submission[1] + '/' + str(submission[0]))
+    topic_url = ("https://onehack.us/t/" + submission[1] + '/' + str(submission[0]))
     response = requests.get(topic_url)
     message = response.text
     dic.append([topic_url,get_forum_message(message)])
