@@ -19,16 +19,16 @@ def cleans_dictionary(raw_dictionary):
 def get_forum_message(page):    
 
     soup = BeautifulSoup(page.content, 'html.parser')
-    for anchors in soup.find_all('a'):
+    for anchors in soup.find_all('a'): #To remove hyperlinks
       anchors.extract()
 
     postData = soup.find_all("p")
     
     posts = []
     for post in postData:
-        posts.append(BeautifulSoup(str(post)).get_text().strip().replace("\t", ""))
+        posts.append(BeautifulSoup(str(post)).get_text().strip().replace("\t", ""))#removing tabs
 
-    posts_stripped = [x.replace("\n","") for x in posts]
+    posts_stripped = [x.replace("\n","") for x in posts]#removing newlines
 
     return posts_stripped
 
