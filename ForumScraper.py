@@ -26,10 +26,14 @@ breaker = len(new_submissions)
 for i in range(breaker):
     print((i/breaker)*100)
     submission = new_submissions[i]
-    topic_url = ("https://community.bnz.co.nz/t/" + submission[1] + '/' + str(submission[0]))
-    response = requests.get(topic_url)
-    message = response.text
-    dic.append([topic_url,get_forum_message(message)])
+    topic_url = ("https://forum.gethopscotch.com//t/" + submission[1] + '/' + str(submission[0]))
+    try:
+
+        response = requests.get(topic_url)
+        message = response.text
+        dic.append([topic_url,get_forum_message(message)])
+    except:
+        print("Error at :",i)    
 
 with open("text_submissions.pickle", "wb") as output_file:
     pickle.dump(dic, output_file)

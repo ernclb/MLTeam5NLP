@@ -19,7 +19,7 @@ i = 1
 new_submissions = []
 crawler_condition = True
 while crawler_condition == True:
-    url = "https://community.bnz.co.nz/latest.json?no_definitions=true&page="+str(i)
+    url = "https://forum.gethopscotch.com/latest.json?no_definitions=true&order=default&page="+str(i)
     r = (requests.get(url)).text
     raw_dictionary = json.loads(r)
     if len(raw_dictionary['topic_list']['topics']) <= 0:
@@ -30,5 +30,7 @@ while crawler_condition == True:
         new_submissions.extend(clean_dictionary)
         i += 1
 
+
+print(len(new_submissions))
 with open("all_the_topic_names.pickle", "wb") as output_file:
      pickle.dump(new_submissions, output_file)
