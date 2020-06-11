@@ -77,7 +77,4 @@ with open("Choice_Community_text.pickle", "wb") as output_file:
 
 
 
-len(new_submissions)
-
-clean_posts
 
