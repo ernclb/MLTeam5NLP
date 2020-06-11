@@ -32,5 +32,5 @@ while crawler_condition == True:
 
 
 print(len(new_submissions))
-# with open("all_the_topic_names.pickle", "wb") as output_file:
-#      pickle.dump(new_submissions, output_file)
+with open("all_the_topic_names.pickle", "wb") as output_file:
+     pickle.dump(new_submissions, output_file)
