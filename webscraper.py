@@ -28,7 +28,7 @@ def cleans_dictionary(raw_dictionary):
       post_dist={}
     
 def get_forum_message(page):    
-
+    
     soup = BeautifulSoup(page.content, 'html.parser')
     for anchors in soup.find_all('a'):
       anchors.extract()
@@ -37,12 +37,13 @@ def get_forum_message(page):
     
     posts = []
     for post in postData:
-        posts.append(BeautifulSoup(str(post)).get_text().strip().replace("\r",""))
+        posts.append(BeautifulSoup(str(post)).get_text().strip('').replace("\r",""))
 
-    posts_stripped = [x.replace("\n","") for x in posts]
+    posts_stripped = [x.replace("\n","") for x in posts]  
+    
+    return ''.join(posts_stripped)
 
-    return posts_stripped
-  
+    
 
 #page_amount = 1
 new_submissions = []
@@ -51,7 +52,7 @@ clean_posts=[]
 page=0
 while True:
     page=page+1
-    url = "https://choice.community/latest.json?no_definitions=true&page=1"+str(page)
+    url = "https://choice.community/latest.json?no_definitions=true&page="+str(page)
     r = (requests.get(url)).text
     raw_dictionary = json.loads(r)
     if len(raw_dictionary['topic_list']['topics']) <= 0:
@@ -74,7 +75,5 @@ for submission in new_submissions:
 
 with open("Choice_Community_text.pickle", "wb") as output_file:
     pickle.dump(clean_posts, output_file)
-
-
 
 
